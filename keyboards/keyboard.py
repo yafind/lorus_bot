@@ -12,6 +12,7 @@ BTN_MINIGAMES = "🎰 Мини-игры"
 BTN_EXCHANGE = "🎁 Обменять алмазики"
 BTN_TOP_UP = "💎 Пополнить алмазы"
 BTN_CHANNEL = "💬 Наш канал"
+BTN_HELP = "❓ Помощь"
 BTN_ADMIN_PANEL = "🛠 Админ панель"
 
 BTN_BACK = "🔙 Назад"
@@ -35,7 +36,10 @@ def start_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
         KeyboardButton(text=BTN_EXCHANGE),
         KeyboardButton(text=BTN_TOP_UP)
     )
-    builder.row(KeyboardButton(text=BTN_CHANNEL))
+    builder.row(
+        KeyboardButton(text=BTN_CHANNEL),
+        KeyboardButton(text=BTN_HELP)
+    )
     
     if is_admin:
         builder.row(KeyboardButton(text=BTN_ADMIN_PANEL))

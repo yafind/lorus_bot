@@ -14,7 +14,26 @@ async def process_referral_reward(user: User, task_reward: float):
     if not referrer:
         return
 
+    # Бонус 10% от награды за задание
     bonus = int(round(task_reward * 0.1))
-    referrer.balance += bonus
+    # Дополнительно 3 алмаза за активацию реферала
+    activation_bonus = 3
+    
+    referrer.balance += bonus + activation_bonus
     referrer.referrals_count += 1
     referrer.save()
+    
+    # Уведомление рефереру об активации
+    try:
+        username = user.username if user.username else f"ID{user.user_id}"
+        await bot.send_message(
+            ref_id,
+            f"🎉 <b>Ваш реферал стал активным!</b>\n\n"
+            f"👤 Реферал: @{username}\n"
+            f"💎 Награда за активацию: +{activation_bonus} алмазов\n"
+            f"💰 Бонус от задания: +{bonus} алмазов\n\n"
+            f"Теперь вы будете получать 10% от всех его наград!",
+            parse_mode="HTML"
+        )
+    except Exception as e:
+        logging.warning(f"Failed to notify referrer {ref_id}: {e}")
