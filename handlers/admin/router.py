@@ -8,11 +8,13 @@ from .tasks import router as tasks_router
 from .gifts import router as gifts_router
 from .admins import router as admins_router
 from .broadcast import router as broadcast_router
+from .panel import router as panel_router
 
 # Create main router
 router = Router()
 
 # Include all sub-routers
+router.include_router(panel_router)
 router.include_router(stats_router)
 router.include_router(balance_router)
 router.include_router(tasks_router)

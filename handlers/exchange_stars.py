@@ -1,25 +1,13 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from database.models import User, Gift, Root
+from database.models import User, Gift
 from keyboards.keyboard import dynamic_gifts_keyboard, back_button_keyboard
+from handlers.utils import is_admin, get_task_completion_count, get_referral_count
 from loader import bot
 from config import payment_chat as PAYMENT_CHAT_LINK, payment_chat_id as PAYMENT_CHAT_ID
 
 router = Router()
-
-
-def is_admin(user_id: int) -> bool:
-    return Root.get_or_none(Root.root_id == user_id) is not None
-
-
-def get_task_completion_count(user_id: int) -> int:
-    user = User.get_or_none(User.user_id == user_id)
-    return user.task_count_diamonds if user else 0
-
-
-def get_referral_count(user_id: int) -> int:
-    return User.select().where(User.referral == user_id).count()
 
 
 @router.callback_query(F.data == "exchange_back")

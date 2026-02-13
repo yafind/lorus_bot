@@ -2,14 +2,9 @@
 import logging
 from typing import Dict, Optional
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from database.models import Root
+from handlers.utils import is_admin
 
 logger = logging.getLogger(__name__)
-
-
-def is_admin(user_id: int) -> bool:
-    """Check if user is admin."""
-    return Root.get_or_none(Root.root_id == user_id) is not None
 
 
 async def safe_edit_or_answer(
