@@ -9,40 +9,18 @@
 </head>
 <body>
   <main class="container">
-    <header class="hero">
-      <h1>Lorus Mini App</h1>
-      <p id="userLine" class="muted">Загрузка данных пользователя...</p>
-      <div class="balance-box">
-        <span class="balance-label">Баланс</span>
-        <strong id="balanceLine">загрузка...</strong>
-      </div>
-      <p id="statusLine" class="status">Готово к работе</p>
-    </header>
+    <h1>Mini App</h1>
+    <p id="userLine" class="muted">Загрузка пользователя...</p>
+    <p class="balance">Баланс: <strong id="balanceLine">...</strong></p>
+    <p class="muted">Ставка: 5 💎</p>
 
-    <section class="section">
-      <h2>Быстрые действия</h2>
-      <div class="cards">
-        <button class="card" id="openTasks">✅ Открыть задания</button>
-        <button class="card" id="openProfile">🍄 Открыть профиль</button>
-        <button class="card" id="openMinigames">🎰 Открыть меню мини-игр</button>
-        <button class="card" id="openTopup">💎 Пополнить алмазы</button>
-      </div>
-    </section>
+    <div class="cards">
+      <button class="card" data-game="dice">🎲 Кубик</button>
+      <button class="card" data-game="basketball">🏀 Баскетбол</button>
+    </div>
 
-    <section class="section">
-      <h2>Мини-игры</h2>
-      <p class="muted small">Ставка в каждой игре — 5 💎</p>
-      <div class="cards games-grid">
-        <button class="card game-card" data-game="dice">🎲 Кубик</button>
-        <button class="card game-card" data-game="basketball">🏀 Баскетбол</button>
-        <button class="card game-card" data-game="football">⚽ Футбол</button>
-        <button class="card game-card" data-game="dart">🎯 Дартс</button>
-        <button class="card game-card" data-game="bowling">🎳 Боулинг</button>
-        <button class="card game-card" data-game="slot_machine">🎰 Слоты</button>
-      </div>
-    </section>
-
-    <a id="paymentLink" class="link" href="#" target="_blank" rel="noopener">Перейти в чат оплаты</a>
+    <p id="resultLine" class="result">Выбери игру</p>
+    <button class="refresh" id="refreshBalance">Обновить баланс</button>
   </main>
 
   <script src="/static/app.js"></script>
