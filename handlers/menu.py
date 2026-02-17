@@ -1,11 +1,14 @@
 """Main menu handlers."""
 import logging
+import json
 from html import escape
 from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
+from config import MINI_APP_URL
 from database.models import User, Gift
 from keyboards.keyboard import toggle_ref_reward_keyboard, minigame_keyboard, dynamic_gifts_keyboard
+from handlers.minigame import launch_minigame
 from handlers.tasks.tasks_view import show_tasks_from_message
 from handlers.tasks.add_task import add_task_start
 from handlers.profile import build_profile_text_simple
@@ -170,3 +173,40 @@ async def help_button(message: Message) -> None:
         "💬 Возникли вопросы? Пиши @supStarsbot"
     )
     await message.answer(help_text, parse_mode="HTML")
+
+
+@router.message(F.text == "📱 Mini App")
+async def mini_app_button(message: Message) -> None:
+    """Fallback handler for Mini App button without WebApp URL."""
+    if MINI_APP_URL:
+        await message.answer(f"Открой Mini App по ссылке: {MINI_APP_URL}")
+        return
+    await message.answer(
+        "Mini App пока не настроен.\n"
+        "Добавьте MINI_APP_URL в .env (HTTPS-ссылка), затем перезапустите бота."
+    )
+
+
+@router.message(F.web_app_data)
+async def mini_app_data_handler(message: Message, state: FSMContext) -> None:
+    """Handle commands from Telegram Mini App via sendData."""
+    try:
+        payload = json.loads(message.web_app_data.data)
+    except Exception:
+        await message.answer("Не удалось обработать команду из Mini App.")
+        return
+
+    command = payload.get("command")
+    if command == "tasks":
+        await tasks_button(message, state)
+    elif command == "profile":
+        await profile_button(message)
+    elif command == "topup":
+        await topup_button(message)
+    elif command == "minigames":
+        await minigame_button(message)
+    elif command and command.startswith("play_"):
+        game_key = command.removeprefix("play_")
+        await launch_minigame(message, message.from_user, state, game_key)
+    else:
+        await message.answer("Неизвестная команда Mini App.")

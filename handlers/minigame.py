@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from aiogram import F, Router
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message, User as TgUser
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.enums.dice_emoji import DiceEmoji
@@ -56,37 +56,43 @@ async def minigame_menu(call: CallbackQuery):
 @router.callback_query(F.data.startswith("play_"))
 async def start_minigame(call: CallbackQuery, state: FSMContext):
     """Запуск мини-игры"""
+    game_key = call.data.removeprefix("play_")
+    await launch_minigame(call.message, call.from_user, state, game_key)
+    await call.answer()
+
+
+async def launch_minigame(message: Message, tg_user: TgUser, state: FSMContext, game_key: str) -> None:
+    """Общий запуск мини-игры из callback и Mini App."""
     # Блокировка параллельных запусков
     if await state.get_state() == MiniGameStates.playing.state:
-        await call.answer("⏳ Игра уже запущена!", show_alert=True)
+        await message.answer("⏳ Игра уже запущена!")
         return
 
-    game_key = call.data.removeprefix("play_")
     if game_key not in GAME_CONFIG:
-        await call.answer("❌ Игра не найдена.", show_alert=True)
+        await message.answer("❌ Игра не найдена.")
         return
 
     emoji, win_condition, payout, game_name = GAME_CONFIG[game_key]
 
     # Списание ставки (атомарная операция)
     if not User.update(balance=User.balance - 5).where(
-        (User.user_id == call.from_user.id) & (User.balance >= 5)
+        (User.user_id == tg_user.id) & (User.balance >= 5)
     ).execute():
-        await call.answer("❌ Недостаточно 💎 для ставки!", show_alert=True)
+        await message.answer("❌ Недостаточно 💎 для ставки!")
         return
 
     await state.set_state(MiniGameStates.playing)
 
     try:
         # Отправка анимации
-        dice_msg = await call.message.answer_dice(emoji=emoji)
+        dice_msg = await message.answer_dice(emoji=emoji)
         await asyncio.sleep(2.5)
 
         # Обработка результата
         if not dice_msg.dice:
             # Возврат ставки при ошибке
-            User.update(balance=User.balance + 5).where(User.user_id == call.from_user.id).execute()
-            await call.message.answer("⚠️ Ошибка игры. Ставка возвращена.")
+            User.update(balance=User.balance + 5).where(User.user_id == tg_user.id).execute()
+            await message.answer("⚠️ Ошибка игры. Ставка возвращена.")
             return
 
         value = dice_msg.dice.value
@@ -94,21 +100,21 @@ async def start_minigame(call: CallbackQuery, state: FSMContext):
 
         # Начисление выигрыша
         if reward:
-            User.update(balance=User.balance + reward).where(User.user_id == call.from_user.id).execute()
+            User.update(balance=User.balance + reward).where(User.user_id == tg_user.id).execute()
 
         # Результат игры
         result = f"✅ <b>ПОБЕДА!</b>\n+{reward} 💎" if reward else "❌ <b>Проигрыш.</b>"
-        await call.message.answer(
+        await message.answer(
             f"🎲 {game_name}\nЗначение: <b>{value}</b>\n{result}",
             parse_mode="HTML"
         )
 
         # Логирование
-        username = call.from_user.username or "—"
-        full_name = call.from_user.full_name or "—"
+        username = tg_user.username or "—"
+        full_name = tg_user.full_name or "—"
         log_text = (
             f"🎲 <b>{game_name}</b>\n"
-            f"👤 <a href='tg://user?id={call.from_user.id}'>{full_name}</a> (@{username})\n"
+            f"👤 <a href='tg://user?id={tg_user.id}'>{full_name}</a> (@{username})\n"
             f"💎 Ставка: 5 → Выплата: {reward}\n"
             f"Значение: {value} → {'ПОБЕДА' if reward else 'ПРОИГРЫШ'}"
         )
@@ -119,5 +125,3 @@ async def start_minigame(call: CallbackQuery, state: FSMContext):
 
     finally:
         await state.clear()
-
-    await call.answer()

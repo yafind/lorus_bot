@@ -3,6 +3,7 @@ import asyncio
 
 from loader import dp, bot
 from database.models import create_tables_safe
+from mini_app.server import start_mini_app_server
 
 # Routers
 from handlers.start import router as start_router
@@ -27,6 +28,7 @@ async def main():
     """Initialize and run the bot."""
     logging.info("Запуск бота...")
     create_tables_safe()
+    mini_app_runner = None
 
     # Register routers
     dp.include_router(start_router)
@@ -41,7 +43,12 @@ async def main():
     # Start background tasks
     asyncio.create_task(process_pending_rewards())
 
-    await dp.start_polling(bot)
+    try:
+        mini_app_runner = await start_mini_app_server()
+        await dp.start_polling(bot)
+    finally:
+        if mini_app_runner:
+            await mini_app_runner.cleanup()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, KeyboardButton, InlineKeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, KeyboardButton, InlineKeyboardButton, WebAppInfo
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
 from database.models import Gift
@@ -14,6 +14,7 @@ BTN_TOP_UP = "💎 Пополнить алмазы"
 BTN_CHANNEL = "💬 Наш канал"
 BTN_HELP = "❓ Помощь"
 BTN_ADMIN_PANEL = "🛠 Админ панель"
+BTN_MINI_APP = "📱 Mini App"
 
 BTN_BACK = "🔙 Назад"
 BTN_NO_GIFTS = "🎁 Подарков пока нет"
@@ -21,7 +22,7 @@ BTN_HIDE_REF_REWARD = "🔺 Скрыть награду от рефералов"
 BTN_SHOW_REF_REWARD = "🔻 Открыть награду от рефералов"
 
 
-def start_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
+def start_keyboard(is_admin: bool = False, mini_app_url: Optional[str] = None) -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
     
     builder.row(
@@ -40,6 +41,13 @@ def start_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
         KeyboardButton(text=BTN_CHANNEL),
         KeyboardButton(text=BTN_HELP)
     )
+
+    if mini_app_url:
+        builder.row(
+            KeyboardButton(text=BTN_MINI_APP, web_app=WebAppInfo(url=mini_app_url))
+        )
+    else:
+        builder.row(KeyboardButton(text=BTN_MINI_APP))
     
     if is_admin:
         builder.row(KeyboardButton(text=BTN_ADMIN_PANEL))

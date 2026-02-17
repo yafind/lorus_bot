@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lorus Mini App</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <h1>Lorus Mini App</h1>
+      <p id="userLine" class="muted">Загрузка данных пользователя...</p>
+      <div class="balance-box">
+        <span class="balance-label">Баланс</span>
+        <strong id="balanceLine">загрузка...</strong>
+      </div>
+      <p id="statusLine" class="status">Готово к работе</p>
+    </header>
+
+    <section class="section">
+      <h2>Быстрые действия</h2>
+      <div class="cards">
+        <button class="card" id="openTasks">✅ Открыть задания</button>
+        <button class="card" id="openProfile">🍄 Открыть профиль</button>
+        <button class="card" id="openMinigames">🎰 Открыть меню мини-игр</button>
+        <button class="card" id="openTopup">💎 Пополнить алмазы</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Мини-игры</h2>
+      <p class="muted small">Ставка в каждой игре — 5 💎</p>
+      <div class="cards games-grid">
+        <button class="card game-card" data-game="dice">🎲 Кубик</button>
+        <button class="card game-card" data-game="basketball">🏀 Баскетбол</button>
+        <button class="card game-card" data-game="football">⚽ Футбол</button>
+        <button class="card game-card" data-game="dart">🎯 Дартс</button>
+        <button class="card game-card" data-game="bowling">🎳 Боулинг</button>
+        <button class="card game-card" data-game="slot_machine">🎰 Слоты</button>
+      </div>
+    </section>
+
+    <a id="paymentLink" class="link" href="#" target="_blank" rel="noopener">Перейти в чат оплаты</a>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

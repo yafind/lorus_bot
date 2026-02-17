@@ -4,6 +4,7 @@ from datetime import datetime
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart
+from config import MINI_APP_URL
 from database.models import User
 from keyboards.keyboard import start_keyboard
 from handlers.utils import create_user
@@ -73,14 +74,14 @@ async def start_handler(message: Message) -> None:
     try:
         await message.answer(
             text,
-            reply_markup=start_keyboard(user_id),
+            reply_markup=start_keyboard(user_id, MINI_APP_URL),
             parse_mode="HTML"
         )
     except Exception as e:
         logger.exception(f"Failed to send welcome message to {user_id}: {e}")
         # Fallback without parse_mode
         clean_text = text.replace("<b>", "").replace("</b>", "")
-        await message.answer(clean_text, reply_markup=start_keyboard(user_id))
+        await message.answer(clean_text, reply_markup=start_keyboard(user_id, MINI_APP_URL))
 
 
 @router.callback_query(F.data == "hide_referral")
